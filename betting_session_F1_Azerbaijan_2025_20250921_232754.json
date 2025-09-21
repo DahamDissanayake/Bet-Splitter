@@ -1,0 +1,53 @@
+{
+  "date": "2025-09-21 23:23:49",
+  "event": "F1 Azerbaijan 2025",
+  "bettors": [
+    {
+      "name": "Daham",
+      "stake": 2000.0
+    },
+    {
+      "name": "Menath",
+      "stake": 1000.0
+    },
+    {
+      "name": "Sithika",
+      "stake": 1000.0
+    }
+  ],
+  "bets": [
+    {
+      "name": "Race Winner -  Team",
+      "description": "McLaren",
+      "odds": 4.34,
+      "stake": 500.0,
+      "potential_payout": 2170.0,
+      "status": "Lost"
+    },
+    {
+      "name": "Podium Finish - Driver",
+      "description": "Carlos",
+      "odds": 9.5,
+      "stake": 500.0,
+      "potential_payout": 4750.0,
+      "status": "Won"
+    },
+    {
+      "name": "Fastest Lap - Driver",
+      "description": "Max",
+      "odds": 4.34,
+      "stake": 500.0,
+      "potential_payout": 2170.0,
+      "status": "Won"
+    },
+    {
+      "name": "Dual Forecast - Race",
+      "description": "Max and Lando",
+      "odds": 3.25,
+      "stake": 500.0,
+      "potential_payout": 1625.0,
+      "status": "Lost"
+    }
+  ],
+  "total_pool": 4000.0
+}
