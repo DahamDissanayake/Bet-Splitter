@@ -11,8 +11,24 @@ class BetSplitterApp:
         self.root.geometry("800x600")
         self.root.configure(bg='#f0f0f0')
         
-        # Remove tkinter icon
-        self.root.iconbitmap()
+        # Set custom icon for the application
+        try:
+            # Try to load custom DAMA icon
+            icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DAMA-app-icon.ico")
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+                self.custom_icon_path = icon_path
+            else:
+                # If custom icon doesn't exist, remove the default tkinter feather icon
+                self.root.iconbitmap('')
+                self.custom_icon_path = None
+        except:
+            # Fallback - try other methods to remove default icon
+            try:
+                self.root.wm_iconbitmap('')
+                self.custom_icon_path = None
+            except:
+                pass
         
         # Data storage
         self.current_session = None
@@ -27,6 +43,21 @@ class BetSplitterApp:
         self.style.configure('Header.TLabel', font=('Arial', 12, 'bold'))
         
         self.create_main_menu()
+        
+    def remove_window_icon(self, window):
+        """Helper method to set custom icon or remove the tkinter feather icon from any window"""
+        try:
+            # Try to use custom DAMA icon if available
+            if hasattr(self, 'custom_icon_path') and self.custom_icon_path and os.path.exists(self.custom_icon_path):
+                window.iconbitmap(self.custom_icon_path)
+            else:
+                # Remove default tkinter icon if no custom icon
+                window.iconbitmap('')
+        except:
+            try:
+                window.wm_iconbitmap('')
+            except:
+                pass
         
     def create_main_menu(self):
         """Create the main menu interface"""
@@ -507,6 +538,9 @@ class BetSplitterApp:
         results_window.grab_set()  # Make window modal
         results_window.resizable(True, True)
         
+        # Remove the tkinter icon from this window
+        self.remove_window_icon(results_window)
+        
         # Main container with padding
         main_container = ttk.Frame(results_window, padding="20")
         main_container.pack(fill=tk.BOTH, expand=True)
@@ -693,6 +727,9 @@ class BetSplitterApp:
         results_window.geometry("600x500")
         results_window.configure(bg='#f0f0f0')
         
+        # Remove the tkinter icon from this window
+        self.remove_window_icon(results_window)
+        
         main_frame = ttk.Frame(results_window, padding="20")
         main_frame.pack(fill=tk.BOTH, expand=True)
         
@@ -763,7 +800,7 @@ class BetSplitterApp:
             ))
             
     def save_session(self):
-        """Save the current session to a JSON file"""
+        """Save the current session to a JSON file - FIXED: Added file dialog"""
         if not self.current_session:
             messagebox.showinfo("Info", "No session to save")
             return
@@ -773,15 +810,34 @@ class BetSplitterApp:
         self.current_session['bets'] = self.bets
         self.current_session['total_pool'] = self.total_pool
         
-        # Generate filename
-        event_name = self.current_session['event'].replace(' ', '_')
+        # Generate default filename
+        event_name = self.current_session['event'].replace(' ', '_').replace('/', '_').replace('\\', '_')
         date_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"betting_session_{event_name}_{date_str}.json"
+        default_filename = f"betting_session_{event_name}_{date_str}.json"
         
+        # Get the directory where the Python file is located
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # Open save file dialog
+        filename = filedialog.asksaveasfilename(
+            title="Save Betting Session",
+            initialdir=current_dir,
+            initialfile=default_filename,
+            filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
+            defaultextension=".json"
+        )
+        
+        if not filename:
+            return  # User cancelled the save dialog
+            
         try:
             with open(filename, 'w') as f:
                 json.dump(self.current_session, f, indent=2)
-            messagebox.showinfo("Success", f"Session saved as {filename}")
+            
+            # Get just the filename for display (not full path)
+            display_name = os.path.basename(filename)
+            messagebox.showinfo("Success", f"Session saved as {display_name}")
+            
         except Exception as e:
             messagebox.showerror("Error", f"Failed to save session: {str(e)}")
             
